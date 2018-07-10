@@ -1,7 +1,5 @@
 #!/bin/bash
 echo "start hadoop-master container..."
-docker network cr
-echo "start hadoop-master container..."
 docker run -itd \
     --net=hadoop \
     -p 9870:9870 \
