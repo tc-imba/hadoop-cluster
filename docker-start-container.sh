@@ -10,13 +10,13 @@ docker run -itd \
 
 for i in {1..2}
 do
-	docker rm -f hadoop-worker-$i &> /dev/null
-	echo "start hadoop-worker-$i container..."
-	docker run -itd \
+    docker rm -f hadoop-worker-$i &> /dev/null
+    echo "start hadoop-worker-$i container..."
+    docker run -itd \
         --net=hadoop \
-	    --name hadoop-worker-$i \
-	    --hostname hadoop-worker-$i \
-	    zzhou612/hadoop:1.0 &> /dev/null
+        --name hadoop-worker-$i \
+        --hostname hadoop-worker-$i \
+        zzhou612/hadoop:1.0 &> /dev/null
 done
 
 docker exec -it hadoop-master bash
