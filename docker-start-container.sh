@@ -8,7 +8,7 @@ docker run -itd \
     --hostname hadoop-master \
     zzhou612/hadoop:1.0 &> /dev/null
 
-for i in {1..2}
+for i in {1..3}
 do
     docker rm -f hadoop-worker-$i &> /dev/null
     echo "start hadoop-worker-$i container..."
