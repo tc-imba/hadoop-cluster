@@ -48,7 +48,7 @@ docker network create --driver=overlay --attachable hadoop-net
 
 4. On `manager`, start an interactive (-it) container `hadoop-master` that connects to `hadoop-net`.
 ```bash
-docker run -it 
+docker run -it \
   --name hadoop-master \
   --hostname hadoop-master \
   --network hadoop-net \
@@ -57,7 +57,7 @@ docker run -it
 
 5. On `worker-n`, start a detached (-d) and interactive (-it) container `hadoop-worker-n` that connects to `hadoop-net`.
 ```bash
-docker run -dit 
+docker run -dit \
   --name hadoop-worker-n \
   --hostname hadoop-worker-n \
   --network hadoop-net \
