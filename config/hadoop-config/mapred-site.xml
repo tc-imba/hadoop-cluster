@@ -25,4 +25,20 @@
     <name>mapreduce.application.classpath</name>
     <value>$HADOOP_HOME/share/hadoop/mapreduce/*:$HADOOP_HOME/share/hadoop/mapreduce/lib/*</value>
   </property>
+  <property>
+    <name>mapreduce.map.memory.mb</name>
+    <value>1536</value>
+  </property>
+  <property>
+    <name>mapreduce.map.java.opts</name>
+    <value>-Xmx1024M</value>
+  </property>
+  <property>
+    <name>mapreduce.reduce.memory.mb</name>
+    <value>2048</value>
+  </property>
+  <property>
+    <name>mapreduce.map.java.opts</name>
+    <value>-Xmx1536M</value>
+  </property>
 </configuration>
