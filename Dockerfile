@@ -39,7 +39,7 @@ RUN wget https://mirrors.tuna.tsinghua.edu.cn/apache/drill/drill-${DRILL_VERSION
     tar -xzvf apache-drill-${DRILL_VERSION}.tar.gz && \
     mv apache-drill-${DRILL_VERSION} /usr/local/drill && \
     rm apache-drill-${DRILL_VERSION}.tar.gz
-COPY config/zookeeper/* ${DRILL_HOME}/conf/
+COPY config/drill/* ${DRILL_HOME}/conf/
 
 # generate & configure ssh key
 RUN ssh-keygen -t rsa -f ~/.ssh/id_rsa -P '' && \
