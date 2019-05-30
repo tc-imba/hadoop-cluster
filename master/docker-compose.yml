@@ -1,7 +1,7 @@
 version: "3.5"
 services:
   master:
-    image: hadoop-cluster:latest
+    image: tcimba/hadoop-cluster:latest
     container_name: hadoop-master
     hostname: hadoop-master
     stdin_open: true
@@ -13,6 +13,9 @@ services:
       - type: volume
         source: logs
         target: /usr/local/hadoop/logs
+      - type: bind
+        source: ${SHELL_FOLDER}/workers
+        target: /usr/local/hadoop/etc/hadoop/workers
     ports:
       - "9870:9870"
       - "8088:8088"
@@ -21,8 +24,7 @@ services:
       - hadoop-net
 networks:
   hadoop-net:
-    name: hadoop-net
-    driver: bridge
+    external: true
 volumes:
   hdfs-data:
   logs:

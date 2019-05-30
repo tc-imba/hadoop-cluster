@@ -7,7 +7,7 @@ WORKDIR /root
 # install openssh-server, openjdk, wget and lsb-core (for drill)
 RUN apt-get update && apt-get install -y apt-transport-https ca-certificates
 COPY config/apt/sources.list /etc/apt/sources.list
-RUN apt-get update && apt-get install -y openssh-server openjdk-11-jdk-headless wget lsb-core
+RUN apt-get update && apt-get install -y openssh-server openjdk-11-jdk-headless curl lsb-core
 
 # setup environment variables
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
@@ -19,7 +19,7 @@ ENV PATH=${JAVA_HOME}/bin:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${PATH}
 #ENV PATH=${DRILL_HOME}/bin:${JAVA_HOME}/bin:${ZOOKEEPER_HOME}/bin:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${PATH}
 
 # install & configure hadoop
-RUN wget https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz && \
+RUN curl -O https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz && \
     tar -xzvf hadoop-${HADOOP_VERSION}.tar.gz && \
     mv hadoop-${HADOOP_VERSION} /usr/local/hadoop && \
     rm hadoop-${HADOOP_VERSION}.tar.gz

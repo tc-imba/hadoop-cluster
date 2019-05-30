@@ -1,7 +1,7 @@
 version: "3.5"
 services:
   worker:
-    image: hadoop-cluster:latest
+    image: tcimba/hadoop-cluster:latest
     container_name: hadoop-worker-${WORKER_ID}
     hostname: hadoop-worker-${WORKER_ID}
     stdin_open: true
@@ -17,8 +17,7 @@ services:
       - hadoop-net
 networks:
   hadoop-net:
-    name: hadoop-net
-    driver: bridge
+    external: true
 volumes:
   hdfs-data:
   logs:
