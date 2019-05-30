@@ -1,16 +1,15 @@
 version: "3.5"
 services:
   master:
-    image: zzhou612/hadoop-cluster:latest
+    image: hadoop-cluster:latest
     container_name: hadoop-master
     hostname: hadoop-master
-    command: ["0"]
     stdin_open: true
     tty: true
     volumes:
       - type: bind
         source: ./data
-        target: /root/data
+        target: /usr/local/hadoop/hdfs/
     ports:
       - "9870:9870"
       - "8088:8088"
@@ -18,7 +17,7 @@ services:
     networks:
       - hadoop
   worker-1:
-    image: zzhou612/hadoop-cluster:latest
+    image: hadoop-cluster:latest
     container_name: hadoop-worker-1
     hostname: hadoop-worker-1
     command: ["1"]

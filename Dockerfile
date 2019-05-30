@@ -23,11 +23,11 @@ RUN wget https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/common/hadoop-${HADO
     tar -xzvf hadoop-${HADOOP_VERSION}.tar.gz && \
     mv hadoop-${HADOOP_VERSION} /usr/local/hadoop && \
     rm hadoop-${HADOOP_VERSION}.tar.gz
-RUN mkdir -p ${HADOOP_HOME}/hdfs/data/nameNode && \
-    mkdir -p ${HADOOP_HOME}/hdfs/data/dataNode
+#RUN mkdir -p ${HADOOP_HOME}/hdfs/data/nameNode && \
+#    mkdir -p ${HADOOP_HOME}/hdfs/data/dataNode
 COPY config/hadoop/* ${HADOOP_HOME}/etc/hadoop/
 # format hdfs
-RUN ${HADOOP_HOME}/bin/hdfs namenode -format
+#RUN ${HADOOP_HOME}/bin/hdfs namenode -format
 
 # install & configure zookeeper
 # RUN wget https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/zookeeper-${ZOOKEEPER_VERSION}.tar.gz && \

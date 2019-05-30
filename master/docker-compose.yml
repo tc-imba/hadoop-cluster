@@ -1,0 +1,28 @@
+version: "3.5"
+services:
+  master:
+    image: hadoop-cluster:latest
+    container_name: hadoop-master
+    hostname: hadoop-master
+    stdin_open: true
+    tty: true
+    volumes:
+      - type: volume
+        source: hdfs-data
+        target: /usr/local/hadoop/hdfs/data
+      - type: volume
+        source: logs
+        target: /usr/local/hadoop/logs
+    ports:
+      - "9870:9870"
+      - "8088:8088"
+      - "8047:8047"
+    networks:
+      - hadoop-net
+networks:
+  hadoop-net:
+    name: hadoop-net
+    driver: bridge
+volumes:
+  hdfs-data:
+  logs:
