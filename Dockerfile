@@ -6,7 +6,7 @@ WORKDIR /root
 
 # install openssh-server, openjdk, wget and lsb-core (for drill)
 RUN apt-get update && apt-get install -y apt-transport-https ca-certificates
-COPY sources.list /etc/apt/sources.list
+COPY config/apt/sources.list /etc/apt/sources.list
 RUN apt-get update && apt-get install -y openssh-server openjdk-11-jdk-headless wget lsb-core
 
 # setup environment variables
