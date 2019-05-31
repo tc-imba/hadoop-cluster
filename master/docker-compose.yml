@@ -24,6 +24,7 @@ services:
       - hadoop-net
 networks:
   hadoop-net:
+    driver: overlay
     external:
       name: hadoop-net
 volumes:
