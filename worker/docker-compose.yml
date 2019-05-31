@@ -17,7 +17,8 @@ services:
       - hadoop-net
 networks:
   hadoop-net:
-    external: true
+    external:
+      name: hadoop-net
 volumes:
   hdfs-data:
   logs:
