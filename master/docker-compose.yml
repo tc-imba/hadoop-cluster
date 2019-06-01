@@ -19,7 +19,7 @@ services:
     ports:
       - "9870:9870"
       - "8088:8088"
-      - "8047:8047"
+      - "19888:19888"
     networks:
       - hadoop-net
 networks:

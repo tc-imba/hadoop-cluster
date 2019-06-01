@@ -4,23 +4,26 @@ ARG HADOOP_VERSION=3.2.0
 #ARG DRILL_VERSION=1.13.0
 WORKDIR /root
 
-# JDK 11 will be supported by hadoop 3.3.0
-ENV JDK_VERSION=8 
 
 # install openssh-server, openjdk, wget and lsb-core (for drill)
 RUN apt-get update && apt-get install -y apt-transport-https ca-certificates
 COPY config/apt/sources.list /etc/apt/sources.list
-RUN apt-get update && apt-get install -y openssh-server openjdk-${JDK_VERSION}-jdk-headless curl lsb-core
+RUN apt-get update && apt-get install -y openssh-server curl
 
-# setup environment variables
+# generate & configure ssh key
+RUN ssh-keygen -t rsa -f ~/.ssh/id_rsa -P '' && \
+    cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+COPY config/ssh/config .ssh/config
 
+# JDK 11 will be supported by hadoop 3.3.0
+ENV JDK_VERSION=8 
 ENV JAVA_HOME=/usr/lib/jvm/java-${JDK_VERSION}-openjdk-amd64
-#ENV ZOOKEEPER_HOME=/usr/local/zookeeper
-#ENV DRILL_HOME=/usr/local/drill
+RUN apt-get install -y openjdk-${JDK_VERSION}-jdk-headless
+
+# setup environment variables for hadoop
 ENV HADOOP_HOME=/usr/local/hadoop
 ENV HADOOP_CLASSPATH=${JAVA_HOME}/lib/tools.jar:${HADOOP_CLASSPATH}
 ENV PATH=${JAVA_HOME}/bin:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${PATH}
-#ENV PATH=${DRILL_HOME}/bin:${JAVA_HOME}/bin:${ZOOKEEPER_HOME}/bin:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${PATH}
 
 # install & configure hadoop
 RUN curl -O https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz && \
@@ -30,6 +33,14 @@ RUN curl -O https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/common/hadoop-${H
 #RUN mkdir -p ${HADOOP_HOME}/hdfs/data/nameNode && \
 #    mkdir -p ${HADOOP_HOME}/hdfs/data/dataNode
 COPY config/hadoop/* ${HADOOP_HOME}/etc/hadoop/
+
+
+
+
+#ENV ZOOKEEPER_HOME=/usr/local/zookeeper
+#ENV DRILL_HOME=/usr/local/drill
+#ENV PATH=${DRILL_HOME}/bin:${JAVA_HOME}/bin:${ZOOKEEPER_HOME}/bin:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${PATH}
+
 # format hdfs
 #RUN ${HADOOP_HOME}/bin/hdfs namenode -format
 
@@ -48,10 +59,8 @@ COPY config/hadoop/* ${HADOOP_HOME}/etc/hadoop/
 #    rm apache-drill-${DRILL_VERSION}.tar.gz
 # COPY config/drill/* ${DRILL_HOME}/conf/
 
-# generate & configure ssh key
-RUN ssh-keygen -t rsa -f ~/.ssh/id_rsa -P '' && \
-    cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-COPY config/ssh/config .ssh/config
+# install utils
+RUN apt-get install -y  net-tools
 
 # copy bash scripts
 COPY script/* ./
