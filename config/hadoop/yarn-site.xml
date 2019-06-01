@@ -42,4 +42,17 @@
     <name>yarn.nodemanager.vmem-pmem-ratio</name>
     <value>5.0</value>
   </property>
+<!-- Web UI properties -->
+  <property>  
+    <name>yarn.resourcemanager.address</name>  
+    <value>master:8032</value>  
+  </property>  
+  <property>  
+    <name>yarn.resourcemanager.scheduler.address</name>  
+    <value>master:8030</value>  
+  </property>  
+  <property>  
+    <name>yarn.resourcemanager.resource-tracker.address</name>  
+    <value>master:8031</value>  
+  </property>
 </configuration>

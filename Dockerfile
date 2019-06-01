@@ -4,13 +4,17 @@ ARG HADOOP_VERSION=3.2.0
 #ARG DRILL_VERSION=1.13.0
 WORKDIR /root
 
+# JDK 11 will be supported by hadoop 3.3.0
+ENV JDK_VERSION=8 
+
 # install openssh-server, openjdk, wget and lsb-core (for drill)
 RUN apt-get update && apt-get install -y apt-transport-https ca-certificates
 COPY config/apt/sources.list /etc/apt/sources.list
-RUN apt-get update && apt-get install -y openssh-server openjdk-11-jdk-headless curl lsb-core
+RUN apt-get update && apt-get install -y openssh-server openjdk-${JDK_VERSION}-jdk-headless curl lsb-core
 
 # setup environment variables
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+
+ENV JAVA_HOME=/usr/lib/jvm/java-${JDK_VERSION}-openjdk-amd64
 #ENV ZOOKEEPER_HOME=/usr/local/zookeeper
 #ENV DRILL_HOME=/usr/local/drill
 ENV HADOOP_HOME=/usr/local/hadoop
