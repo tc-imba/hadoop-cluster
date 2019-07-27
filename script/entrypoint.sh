@@ -50,4 +50,4 @@ ${ZOOKEEPER_HOME}/bin/zkServer.sh start
 # start drill
 ${DRILL_HOME}/bin/drillbit.sh start 
 
-bash
+zsh

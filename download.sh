@@ -3,6 +3,7 @@
 HADOOP_VERSION=3.2.0
 DRILL_VERSION=1.16.0
 ZOOKEEPER_VERSION=3.5.5
+SPARK_VERSION=2.4.3
 
 SHELL_FOLDER=$(cd "$(dirname "$0")";pwd)
 TARBALL_FOLDER=$SHELL_FOLDER/tarballs
@@ -41,4 +42,6 @@ check_download apache-drill-$DRILL_VERSION.tar.gz https://mirrors.tuna.tsinghua.
 
 check_download apache-zookeeper-$ZOOKEEPER_VERSION-bin.tar.gz https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-${ZOOKEEPER_VERSION}
 
+#check_download pyspark-$SPARK_VERSION.tar.gz https://mirrors.tuna.tsinghua.edu.cn/apache/spark/spark-2.4.3/
 
+check_download spark-$SPARK_VERSION-bin-without-hadoop.tgz https://mirrors.tuna.tsinghua.edu.cn/apache/spark/spark-2.4.3/

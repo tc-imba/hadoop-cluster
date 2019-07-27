@@ -1,12 +1,12 @@
 FROM ubuntu:18.04
 WORKDIR /root
 
-# install openssh-server, curl and lsb-core (for drill)
+# install openssh-server, curl, python and scala (for spark)
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && apt-get install -y apt-transport-https ca-certificates
 COPY config/apt/sources.list /etc/apt/sources.list
-RUN apt-get update && apt-get install -y openssh-server curl
+RUN apt-get update && apt-get install -y openssh-server curl python3 python3-pip scala
 
 # generate & configure ssh key
 RUN ssh-keygen -t rsa -f ~/.ssh/id_rsa -P '' && \
@@ -27,7 +27,7 @@ RUN bash download.sh
 RUN useradd -u 1500 -s /bin/bash -d /home/hadoop hadoop
 
 # install utils
-RUN apt-get install -y apt-utils net-tools locales pv
+RUN apt-get install -y apt-utils net-tools locales pv pandoc
 RUN locale-gen en_US.UTF-8
 
 # setup environment variables for hadoop
@@ -44,6 +44,7 @@ RUN pv -n tarballs/hadoop-${HADOOP_VERSION}.tar.gz | \
 #RUN mkdir -p ${HADOOP_HOME}/hdfs/data/nameNode && \
 #    mkdir -p ${HADOOP_HOME}/hdfs/data/dataNode
 COPY config/hadoop/* ${HADOOP_HOME}/etc/hadoop/
+ENV LD_LIBRARY_PATH=${HADOOP_HOME}/lib/native
 
 # install & configure drill
 ARG DRILL_VERSION=1.16.0
@@ -66,8 +67,27 @@ RUN pv -n tarballs/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz | \
 COPY config/zookeeper/* ${ZOOKEEPER_HOME}/conf/
 ENV PATH=${ZOOKEEPER_HOME}/bin:${PATH}
 
+# install & configure spark
+ARG SPARK_VERSION=2.4.3
+ENV SPARK_HOME=/usr/local/spark
+#RUN pip3 install tarballs/pyspark-${SPARK_VERSION}.tar.gz && \
+#    rm tarballs/pyspark-${SPARK_VERSION}.tar.gz
+RUN pv -n tarballs/spark-${SPARK_VERSION}-bin-without-hadoop.tgz | \
+    tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf - && \
+    mv spark-${SPARK_VERSION}-bin-without-hadoop ${SPARK_HOME} && \
+    rm tarballs/spark-${SPARK_VERSION}-bin-without-hadoop.tgz
+#RUN cd ${SPARK_HOME}/python && \
+#    python3 setup.py sdist > /dev/null && \
+#    pip3 install dist/pyspark-${SPARK_VERSION}.tar.gz && \
+#    rm dist/pyspark-${SPARK_VERSION}.tar.gz
+COPY config/spark/* ${SPARK_HOME}/conf/
+ENV PATH=${SPARK_HOME}/bin:${PATH}
+
 # install softwares
-RUN apt-get install -y vim nano sudo git zsh
+RUN apt-get install -y man vim nano sudo git zsh
+RUN ln -s /usr/bin/python3 /usr/bin/python
+RUN sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+COPY config/zsh/* ./
 
 # format hdfs
 #RUN ${HADOOP_HOME}/bin/hdfs namenode -format
