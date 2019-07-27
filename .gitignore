@@ -4,3 +4,5 @@ remove-all-containers.sh
 .DS_Store
 master/workers
 *.tar.gz
+.directory
+tarballs

@@ -1,11 +1,9 @@
 FROM ubuntu:18.04
-ARG HADOOP_VERSION=3.2.0
-#ARG ZOOKEEPER_VERSION=3.4.13
-#ARG DRILL_VERSION=1.13.0
 WORKDIR /root
 
+# install openssh-server, curl and lsb-core (for drill)
+ENV DEBIAN_FRONTEND noninteractive
 
-# install openssh-server, openjdk, wget and lsb-core (for drill)
 RUN apt-get update && apt-get install -y apt-transport-https ca-certificates
 COPY config/apt/sources.list /etc/apt/sources.list
 RUN apt-get update && apt-get install -y openssh-server curl
@@ -20,26 +18,56 @@ ENV JDK_VERSION=8
 ENV JAVA_HOME=/usr/lib/jvm/java-${JDK_VERSION}-openjdk-amd64
 RUN apt-get install -y openjdk-${JDK_VERSION}-jdk-headless
 
+# copy downloaded files and download new files
+COPY tarballs/* tarballs/
+COPY download.sh ./
+RUN bash download.sh
+
+# setup hadoop user group
+RUN useradd -u 1500 -s /bin/bash -d /home/hadoop hadoop
+
+# install utils
+RUN apt-get install -y apt-utils net-tools locales pv
+RUN locale-gen en_US.UTF-8
+
 # setup environment variables for hadoop
 ENV HADOOP_HOME=/usr/local/hadoop
 ENV HADOOP_CLASSPATH=${JAVA_HOME}/lib/tools.jar:${HADOOP_CLASSPATH}
 ENV PATH=${JAVA_HOME}/bin:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${PATH}
 
 # install & configure hadoop
-RUN curl -O https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz && \
-    tar -xzvf hadoop-${HADOOP_VERSION}.tar.gz && \
-    mv hadoop-${HADOOP_VERSION} /usr/local/hadoop && \
-    rm hadoop-${HADOOP_VERSION}.tar.gz
+ARG HADOOP_VERSION=3.2.0
+RUN pv -n tarballs/hadoop-${HADOOP_VERSION}.tar.gz | \
+    tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf - && \
+    mv hadoop-${HADOOP_VERSION} ${HADOOP_HOME} && \
+    rm tarballs/hadoop-${HADOOP_VERSION}.tar.gz
 #RUN mkdir -p ${HADOOP_HOME}/hdfs/data/nameNode && \
 #    mkdir -p ${HADOOP_HOME}/hdfs/data/dataNode
 COPY config/hadoop/* ${HADOOP_HOME}/etc/hadoop/
 
+# install & configure drill
+ARG DRILL_VERSION=1.16.0
+ENV DRILL_HOME=/usr/local/drill
+RUN pv -n tarballs/apache-drill-${DRILL_VERSION}.tar.gz | \
+    tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf - && \
+    mv apache-drill-${DRILL_VERSION} ${DRILL_HOME} && \
+    rm tarballs/apache-drill-${DRILL_VERSION}.tar.gz
+COPY config/drill/* ${DRILL_HOME}/conf/
+ENV PATH=${DRILL_HOME}/bin:${PATH}
 
+# install & configure zookeeper
+ARG ZOOKEEPER_VERSION=3.5.5
+ENV ZOOKEEPER_HOME=/usr/local/zookeeper
+RUN pv -n tarballs/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz | \
+    tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf - && \
+    mv apache-zookeeper-${ZOOKEEPER_VERSION}-bin ${ZOOKEEPER_HOME} && \
+    rm tarballs/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz
+# RUN mkdir -p ${ZOOKEEPER_HOME}/data
+COPY config/zookeeper/* ${ZOOKEEPER_HOME}/conf/
+ENV PATH=${ZOOKEEPER_HOME}/bin:${PATH}
 
-
-#ENV ZOOKEEPER_HOME=/usr/local/zookeeper
-#ENV DRILL_HOME=/usr/local/drill
-#ENV PATH=${DRILL_HOME}/bin:${JAVA_HOME}/bin:${ZOOKEEPER_HOME}/bin:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${PATH}
+# install softwares
+RUN apt-get install -y vim nano sudo git zsh
 
 # format hdfs
 #RUN ${HADOOP_HOME}/bin/hdfs namenode -format
@@ -59,8 +87,10 @@ COPY config/hadoop/* ${HADOOP_HOME}/etc/hadoop/
 #    rm apache-drill-${DRILL_VERSION}.tar.gz
 # COPY config/drill/* ${DRILL_HOME}/conf/
 
-# install utils
-RUN apt-get install -y  net-tools
+
+#RUN useradd -u 1500 -s /bin/bash hadoop && \
+#    chown -R hadoop:hadoop ${HADOOP_HOME} ${DRILL_HOME} ${ZOOKEEPER_HOME} && \
+#    chmod -R g+wx ${HADOOP_HOME} ${DRILL_HOME} ${ZOOKEEPER_HOME}
 
 # copy bash scripts
 COPY script/* ./
@@ -71,4 +101,4 @@ RUN chmod +x ~/entrypoint.sh && \
     chmod +x ${HADOOP_HOME}/sbin/start-yarn.sh
 
 ENTRYPOINT ["/root/entrypoint.sh"]
-CMD ["0"]
+#CMD ["0"]

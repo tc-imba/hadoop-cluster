@@ -1,11 +1,16 @@
 #!/bin/bash
+if [ ! -n "$WORKER_NUMBER" ]; then
+    echo "error: WORKER_NUMBER not defined!"
+    exit -1
+fi
+
 export SHELL_FOLDER=$(cd "$(dirname "$0")";pwd)
 
-read -p "input the worker number: " WORKER_NUMBER
-rm -f "$SHELL_FOLDER/workers"
-for ((i=1;i<=WORKER_NUMBER;i++)); do
-    echo "hadoop-worker-$i" >> "$SHELL_FOLDER/workers"
-done
+#if [ ! -d $SHELL_FOLDER/../.config ]; then
+#    echo "error: config not found!"
+#    exit -1
+#fi
+#export CONFIG_FOLDER=$(cd "$(dirname "$0")/../.config";pwd)
 
 echo "start hadoop-master"
 docker-compose -f "$SHELL_FOLDER/docker-compose.yml" -p hadoop-master up -d

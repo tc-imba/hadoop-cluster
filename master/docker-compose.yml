@@ -13,15 +13,24 @@ services:
       - type: volume
         source: logs
         target: /usr/local/hadoop/logs
-      - type: bind
-        source: ${SHELL_FOLDER}/workers
-        target: /usr/local/hadoop/etc/hadoop/workers
+      - type: volume
+        source: zookeeper-data
+        target: /usr/local/zookeeper/data
+#      - type: bind
+#        source: ${CONFIG_FOLDER}/workers
+#        target: /usr/local/hadoop/etc/hadoop/workers
+#      - type: bind
+#        source: ${CONFIG_FOLDER}/zoo.cfg
+#        target: /usr/local/zookeeper/conf/zoo.cfg
     ports:
       - "9870:9870"
       - "8088:8088"
+      - "8047:8047"
       - "19888:19888"
+      - "22:22"
     networks:
       - hadoop-net
+    command: ${WORKER_NUMBER} 0
 networks:
   hadoop-net:
     driver: overlay
@@ -30,3 +39,4 @@ networks:
 volumes:
   hdfs-data:
   logs:
+  zookeeper-data:

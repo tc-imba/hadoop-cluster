@@ -50,12 +50,12 @@
 # Amount of heap memory for the Drillbit process. Values are those supported by
 # the Java -Xms option. The default is 4G.
 
-export DRILL_HEAP=${DRILL_HEAP:-"512M"}
+export DRILL_HEAP=${DRILL_HEAP:-"4G"}
 
 # Maximum amount of direct memory to allocate to the Drillbit in the format
 # supported by -XX:MaxDirectMemorySize. Default is 8G.
 
-export DRILL_MAX_DIRECT_MEMORY=${DRILL_MAX_DIRECT_MEMORY:-"1G"}
+export DRILL_MAX_DIRECT_MEMORY=${DRILL_MAX_DIRECT_MEMORY:-"8G"}
 
 # Native library path passed to Java. Note: use this form instead
 # of the old form of DRILLBIT_JAVA_OPTS="-Djava.library.path=<dir>"
