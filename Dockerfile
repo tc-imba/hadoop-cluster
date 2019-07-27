@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && apt-get install -y apt-transport-https ca-certificates
 COPY config/apt/sources.list /etc/apt/sources.list
-RUN apt-get update && apt-get install -y openssh-server curl python3 python3-pip scala
+RUN apt-get update && apt-get install -y openssh-server curl python3 python3-pip scala r-base
 
 # generate & configure ssh key
 RUN ssh-keygen -t rsa -f ~/.ssh/id_rsa -P '' && \
@@ -84,29 +84,16 @@ COPY config/spark/* ${SPARK_HOME}/conf/
 ENV PATH=${SPARK_HOME}/bin:${PATH}
 
 # install softwares
-RUN apt-get install -y man vim nano sudo git zsh
+RUN apt-get install -y man vim nano sudo git zsh 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 COPY config/zsh/* ./
 
-# format hdfs
-#RUN ${HADOOP_HOME}/bin/hdfs namenode -format
+# install python packages
+RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple virtualenv pipenv 
 
-# install & configure zookeeper
-# RUN wget https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/zookeeper-${ZOOKEEPER_VERSION}.tar.gz && \
-#    tar -xzvf zookeeper-${ZOOKEEPER_VERSION}.tar.gz && \
-#    mv zookeeper-${ZOOKEEPER_VERSION} /usr/local/zookeeper && \
-#    rm zookeeper-${ZOOKEEPER_VERSION}.tar.gz
-# RUN mkdir -p ${ZOOKEEPER_HOME}/data
-# COPY config/zookeeper/* ${ZOOKEEPER_HOME}/conf/
-
-# install & configure drill
-# RUN wget https://mirrors.tuna.tsinghua.edu.cn/apache/drill/drill-${DRILL_VERSION}/apache-drill-${DRILL_VERSION}.tar.gz && \
-#    tar -xzvf apache-drill-${DRILL_VERSION}.tar.gz && \
-#    mv apache-drill-${DRILL_VERSION} /usr/local/drill && \
-#    rm apache-drill-${DRILL_VERSION}.tar.gz
-# COPY config/drill/* ${DRILL_HOME}/conf/
-
+# install hdf5 packages
+RUN apt-get install -y libjhdf5-java libhdf5-dev hdf5-tools hdf5-helpers
 
 #RUN useradd -u 1500 -s /bin/bash hadoop && \
 #    chown -R hadoop:hadoop ${HADOOP_HOME} ${DRILL_HOME} ${ZOOKEEPER_HOME} && \
