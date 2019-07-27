@@ -76,10 +76,10 @@ RUN pv -n tarballs/spark-${SPARK_VERSION}-bin-without-hadoop.tgz | \
     tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf - && \
     mv spark-${SPARK_VERSION}-bin-without-hadoop ${SPARK_HOME} && \
     rm tarballs/spark-${SPARK_VERSION}-bin-without-hadoop.tgz
-#RUN cd ${SPARK_HOME}/python && \
-#    python3 setup.py sdist > /dev/null && \
-#    pip3 install dist/pyspark-${SPARK_VERSION}.tar.gz && \
-#    rm dist/pyspark-${SPARK_VERSION}.tar.gz
+RUN cd ${SPARK_HOME}/python && \
+    python3 setup.py sdist > /dev/null && \
+    pip3 install dist/pyspark-${SPARK_VERSION}.tar.gz && \
+    rm dist/pyspark-${SPARK_VERSION}.tar.gz
 COPY config/spark/* ${SPARK_HOME}/conf/
 ENV PATH=${SPARK_HOME}/bin:${PATH}
 
