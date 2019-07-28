@@ -6,3 +6,4 @@ master/workers
 *.tar.gz
 .directory
 tarballs
+.config

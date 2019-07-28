@@ -58,9 +58,11 @@ RUN apt-get install -y openjdk-${JDK_VERSION}-jdk-headless python python-pip \
                         binutils build-essential cmake x11-xserver-utils clang libgmp-dev
 
 # generate & configure ssh key
-RUN ssh-keygen -t rsa -f ~/.ssh/id_rsa -P '' && \
-    cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-COPY config/ssh/config .ssh/config
+#RUN ssh-keygen -t rsa -f ~/.ssh/id_rsa -P '' && \
+#    cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+COPY .config/id_rsa .config/id_rsa.pub config/ssh/config .ssh/
+RUN cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+#COPY config/ssh/config .ssh/config
 
 
 # setup hadoop user group
