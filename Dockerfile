@@ -37,9 +37,11 @@ WORKDIR /root
 # install openssh-server, curl, python and scala (for spark)
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update && apt-get install -y apt-transport-https ca-certificates
+RUN apt-get update && apt-get install -y apt-transport-https ca-certificates apt-utils 
 COPY config/apt/sources.list /etc/apt/sources.list
-RUN apt-get update && apt-get install -y openssh-server curl python3 python3-pip scala r-base
+RUN apt-get update && \
+    apt-get install -y openssh-server curl python3 python3-pip scala r-base gcc g++ \
+                        binutils build-essential cmake x11-xserver-utils clang libgmp-dev
 
 # generate & configure ssh key
 RUN ssh-keygen -t rsa -f ~/.ssh/id_rsa -P '' && \
@@ -57,7 +59,7 @@ RUN apt-get install -y openjdk-${JDK_VERSION}-jdk-headless
 RUN useradd -u 1500 -s /bin/bash -d /home/hadoop hadoop
 
 # install utils
-RUN apt-get install -y apt-utils net-tools locales pv pandoc
+RUN apt-get install -y net-tools locales pv pandoc man vim nano sudo git 
 RUN locale-gen en_US.UTF-8
 
 # setup environment variables for hadoop
@@ -118,10 +120,11 @@ COPY config/spark/* ${SPARK_HOME}/conf/
 ENV PATH=${SPARK_HOME}/bin:${PATH}
 
 # install softwares
-RUN apt-get install -y man vim nano sudo git zsh 
+RUN apt-get install -y zsh screen unrar maven
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 COPY config/zsh/* ./
+COPY config/screen/* ./
 
 # install python packages
 RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple virtualenv pipenv 
