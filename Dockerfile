@@ -1,3 +1,36 @@
+ARG HADOOP_VERSION=3.2.0
+ARG DRILL_VERSION=1.16.0
+ARG ZOOKEEPER_VERSION=3.5.5
+ARG SPARK_VERSION=2.4.3
+
+FROM ubuntu:18.04 AS tarballs
+WORKDIR /root
+
+RUN apt-get update && apt-get -y install pv curl
+
+# copy downloaded files and download new files
+COPY tarballs/* tarballs/
+COPY download.sh ./
+RUN bash download.sh
+
+RUN useradd -u 1500 -s /bin/bash -d /home/hadoop hadoop
+
+ARG HADOOP_VERSION
+RUN pv -n tarballs/hadoop-${HADOOP_VERSION}.tar.gz | \
+    tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf -
+
+ARG DRILL_VERSION
+RUN pv -n tarballs/apache-drill-${DRILL_VERSION}.tar.gz | \
+    tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf -
+
+ARG ZOOKEEPER_VERSION
+RUN pv -n tarballs/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz | \
+    tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf - 
+
+ARG SPARK_VERSION
+RUN pv -n tarballs/spark-${SPARK_VERSION}-bin-without-hadoop.tgz | \
+    tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf - 
+    
 FROM ubuntu:18.04
 WORKDIR /root
 
@@ -18,10 +51,7 @@ ENV JDK_VERSION=8
 ENV JAVA_HOME=/usr/lib/jvm/java-${JDK_VERSION}-openjdk-amd64
 RUN apt-get install -y openjdk-${JDK_VERSION}-jdk-headless
 
-# copy downloaded files and download new files
-COPY tarballs/* tarballs/
-COPY download.sh ./
-RUN bash download.sh
+
 
 # setup hadoop user group
 RUN useradd -u 1500 -s /bin/bash -d /home/hadoop hadoop
@@ -36,46 +66,50 @@ ENV HADOOP_CLASSPATH=${JAVA_HOME}/lib/tools.jar:${HADOOP_CLASSPATH}
 ENV PATH=${JAVA_HOME}/bin:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${PATH}
 
 # install & configure hadoop
-ARG HADOOP_VERSION=3.2.0
-RUN pv -n tarballs/hadoop-${HADOOP_VERSION}.tar.gz | \
-    tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf - && \
-    mv hadoop-${HADOOP_VERSION} ${HADOOP_HOME} && \
-    rm tarballs/hadoop-${HADOOP_VERSION}.tar.gz
+ARG HADOOP_VERSION
+COPY --chown=hadoop:hadoop --from=tarballs /root/hadoop-${HADOOP_VERSION} ${HADOOP_HOME}/
+#RUN pv -n tarballs/hadoop-${HADOOP_VERSION}.tar.gz | \
+#    tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf - && \
+#    mv hadoop-${HADOOP_VERSION} ${HADOOP_HOME} && \
+#    rm tarballs/hadoop-${HADOOP_VERSION}.tar.gz
 #RUN mkdir -p ${HADOOP_HOME}/hdfs/data/nameNode && \
 #    mkdir -p ${HADOOP_HOME}/hdfs/data/dataNode
 COPY config/hadoop/* ${HADOOP_HOME}/etc/hadoop/
 ENV LD_LIBRARY_PATH=${HADOOP_HOME}/lib/native
 
 # install & configure drill
-ARG DRILL_VERSION=1.16.0
+ARG DRILL_VERSION
 ENV DRILL_HOME=/usr/local/drill
-RUN pv -n tarballs/apache-drill-${DRILL_VERSION}.tar.gz | \
-    tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf - && \
-    mv apache-drill-${DRILL_VERSION} ${DRILL_HOME} && \
-    rm tarballs/apache-drill-${DRILL_VERSION}.tar.gz
+COPY --chown=hadoop:hadoop --from=tarballs /root/apache-drill-${DRILL_VERSION} ${DRILL_HOME}/
+#RUN pv -n tarballs/apache-drill-${DRILL_VERSION}.tar.gz | \
+#    tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf - && \
+#    mv apache-drill-${DRILL_VERSION} ${DRILL_HOME} && \
+#    rm tarballs/apache-drill-${DRILL_VERSION}.tar.gz
 COPY config/drill/* ${DRILL_HOME}/conf/
 ENV PATH=${DRILL_HOME}/bin:${PATH}
 
 # install & configure zookeeper
-ARG ZOOKEEPER_VERSION=3.5.5
+ARG ZOOKEEPER_VERSION
 ENV ZOOKEEPER_HOME=/usr/local/zookeeper
-RUN pv -n tarballs/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz | \
-    tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf - && \
-    mv apache-zookeeper-${ZOOKEEPER_VERSION}-bin ${ZOOKEEPER_HOME} && \
-    rm tarballs/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz
+COPY --chown=hadoop:hadoop --from=tarballs /root/apache-zookeeper-${ZOOKEEPER_VERSION}-bin ${ZOOKEEPER_HOME}/
+#RUN pv -n tarballs/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz | \
+#    tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf - && \
+#    mv apache-zookeeper-${ZOOKEEPER_VERSION}-bin ${ZOOKEEPER_HOME} && \
+#    rm tarballs/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz
 # RUN mkdir -p ${ZOOKEEPER_HOME}/data
 COPY config/zookeeper/* ${ZOOKEEPER_HOME}/conf/
 ENV PATH=${ZOOKEEPER_HOME}/bin:${PATH}
 
 # install & configure spark
-ARG SPARK_VERSION=2.4.3
+ARG SPARK_VERSION
 ENV SPARK_HOME=/usr/local/spark
+COPY --chown=hadoop:hadoop --from=tarballs /root/spark-${SPARK_VERSION}-bin-without-hadoop ${SPARK_HOME}/
 #RUN pip3 install tarballs/pyspark-${SPARK_VERSION}.tar.gz && \
 #    rm tarballs/pyspark-${SPARK_VERSION}.tar.gz
-RUN pv -n tarballs/spark-${SPARK_VERSION}-bin-without-hadoop.tgz | \
-    tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf - && \
-    mv spark-${SPARK_VERSION}-bin-without-hadoop ${SPARK_HOME} && \
-    rm tarballs/spark-${SPARK_VERSION}-bin-without-hadoop.tgz
+#RUN pv -n tarballs/spark-${SPARK_VERSION}-bin-without-hadoop.tgz | \
+#    tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf - && \
+#    mv spark-${SPARK_VERSION}-bin-without-hadoop ${SPARK_HOME} && \
+#    rm tarballs/spark-${SPARK_VERSION}-bin-without-hadoop.tgz
 RUN cd ${SPARK_HOME}/python && \
     python3 setup.py sdist > /dev/null && \
     pip3 install dist/pyspark-${SPARK_VERSION}.tar.gz && \
@@ -103,9 +137,10 @@ RUN apt-get install -y libjhdf5-java libhdf5-dev hdf5-tools hdf5-helpers
 COPY script/* ./
 RUN chmod +x ~/entrypoint.sh && \
     chmod +x ~/start-hadoop.sh && \
-    chmod +x ~/run-wordcount.sh && \
-    chmod +x ${HADOOP_HOME}/sbin/start-dfs.sh && \
-    chmod +x ${HADOOP_HOME}/sbin/start-yarn.sh
+    chmod +x ~/run-wordcount.sh 
+# && \
+#    chmod +x ${HADOOP_HOME}/sbin/start-dfs.sh && \
+#    chmod +x ${HADOOP_HOME}/sbin/start-yarn.sh
 
 ENTRYPOINT ["/root/entrypoint.sh"]
 #CMD ["0"]

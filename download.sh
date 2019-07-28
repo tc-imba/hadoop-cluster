@@ -36,12 +36,30 @@ function check_download {
     echo "downloaded: $1!"
 }
 
-check_download hadoop-$HADOOP_VERSION.tar.gz https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/common/hadoop-${HADOOP_VERSION}
+function download_hadoop {
+    check_download hadoop-$HADOOP_VERSION.tar.gz https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/common/hadoop-${HADOOP_VERSION}
+}
 
-check_download apache-drill-$DRILL_VERSION.tar.gz https://mirrors.tuna.tsinghua.edu.cn/apache/drill/drill-${DRILL_VERSION}
+function download_drill {
+    check_download apache-drill-$DRILL_VERSION.tar.gz https://mirrors.tuna.tsinghua.edu.cn/apache/drill/drill-${DRILL_VERSION}
+}
 
-check_download apache-zookeeper-$ZOOKEEPER_VERSION-bin.tar.gz https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-${ZOOKEEPER_VERSION}
+function download_zookeeper {
+    check_download apache-zookeeper-$ZOOKEEPER_VERSION-bin.tar.gz https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/zookeeper-${ZOOKEEPER_VERSION}
+}
+
+function download_spark {
+    check_download spark-$SPARK_VERSION-bin-without-hadoop.tgz https://mirrors.tuna.tsinghua.edu.cn/apache/spark/spark-2.4.3/
+}
+
+case $1 in
+    hadoop) download_hadoop ;;
+    drill) download_drill ;;
+    zookeeper) download_zookeeper ;;
+    spark) download_spark;;
+    *) download_hadoop;download_drill;download_zookeeper;download_spark ;;
+esac
+
 
 #check_download pyspark-$SPARK_VERSION.tar.gz https://mirrors.tuna.tsinghua.edu.cn/apache/spark/spark-2.4.3/
 
-check_download spark-$SPARK_VERSION-bin-without-hadoop.tgz https://mirrors.tuna.tsinghua.edu.cn/apache/spark/spark-2.4.3/
