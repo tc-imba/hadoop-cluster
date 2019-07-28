@@ -8,6 +8,9 @@ services:
     tty: true
     volumes:
       - type: volume
+        source: home
+        target: /home
+      - type: volume
         source: hdfs-data
         target: /usr/local/hadoop/hdfs/data
       - type: volume
@@ -37,6 +40,7 @@ networks:
     external:
       name: hadoop-net
 volumes:
+  home:
   hdfs-data:
   logs:
   zookeeper-data:

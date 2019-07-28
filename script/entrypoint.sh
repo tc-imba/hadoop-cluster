@@ -1,11 +1,21 @@
 #!/bin/bash
 
 # init user and groups
-useradd -u 1500 -s /bin/bash hadoop
+# useradd -u 1500 -s /bin/bash hadoop
+if [ ! -d "/home/hadoop" ]; then
+    mkdir -p /home/hadoop
+    chown -R hadoop:hadoop /home/hadoop
+fi
+echo "hadoop ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
 for ((i=1;i<=10;i++)); do
     let "uid=$i+1500"
-    useradd -u $uid -s /bin/bash pgroup$i
+    useradd -u $uid -s /bin/bash -d /home/pgroup$i -m pgroup$i
+    usermod -a -G hadoop pgroup$i
 done
+
+chmod -R 766 ${HADOOP_HOME}/logs
+chown -R hadoop:hadoop ${HADOOP_HOME}/logs
 
 # init hdfs for a new node
 # the ${HADOOP_HOME}/hdfs/data needs to be mounted

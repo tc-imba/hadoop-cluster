@@ -1,0 +1,23 @@
+version: "3.5"
+services:
+  apt-cache:
+    image: tcimba/hadoop-cluster-apt-cache:latest
+    container_name: hadoop-apt-cache
+    hostname: hadoop-apt-cache
+    stdin_open: true
+    tty: true
+    volumes:
+      - type: volume
+        source: apt-cache-data
+        target: /var/cache/apt-cacher-ng
+    ports:
+      - "3142:3142"
+    networks:
+      - hadoop-net
+networks:
+  hadoop-net:
+    driver: overlay
+    external:
+      name: hadoop-net
+volumes:
+  apt-cache-data:

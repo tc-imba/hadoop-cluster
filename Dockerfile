@@ -6,6 +6,11 @@ ARG SPARK_VERSION=2.4.3
 FROM ubuntu:18.04 AS tarballs
 WORKDIR /root
 
+ENV DEBIAN_FRONTEND noninteractive
+
+COPY config/apt/sources.list /etc/apt/sources.list
+RUN echo 'Acquire::http { Proxy "http://hadoop-apt-cache:3142"; };' >> /etc/apt/apt.conf.d/01proxy
+
 RUN apt-get update && apt-get -y install pv curl
 
 # copy downloaded files and download new files
@@ -37,10 +42,19 @@ WORKDIR /root
 # install openssh-server, curl, python and scala (for spark)
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update && apt-get install -y apt-transport-https ca-certificates apt-utils 
+
 COPY config/apt/sources.list /etc/apt/sources.list
-RUN apt-get update && \
-    apt-get install -y openssh-server curl python3 python3-pip scala r-base gcc g++ \
+RUN echo 'Acquire::http { Proxy "http://hadoop-apt-cache:3142"; };' >> /etc/apt/apt.conf.d/01proxy
+RUN echo "" > /etc/dpkg/dpkg.cfg.d/excludes
+
+RUN apt-get update && apt-get install -y apt-transport-https ca-certificates apt-utils man
+
+# JDK 11 will be supported by hadoop 3.3.0
+ENV JDK_VERSION=8 
+ENV JAVA_HOME=/usr/lib/jvm/java-${JDK_VERSION}-openjdk-amd64
+
+RUN apt-get install -y openjdk-${JDK_VERSION}-jdk-headless python python-pip \
+                        openssh-server curl python3 python3-pip scala r-base gcc g++ \
                         binutils build-essential cmake x11-xserver-utils clang libgmp-dev
 
 # generate & configure ssh key
@@ -48,18 +62,12 @@ RUN ssh-keygen -t rsa -f ~/.ssh/id_rsa -P '' && \
     cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 COPY config/ssh/config .ssh/config
 
-# JDK 11 will be supported by hadoop 3.3.0
-ENV JDK_VERSION=8 
-ENV JAVA_HOME=/usr/lib/jvm/java-${JDK_VERSION}-openjdk-amd64
-RUN apt-get install -y openjdk-${JDK_VERSION}-jdk-headless
-
-
 
 # setup hadoop user group
 RUN useradd -u 1500 -s /bin/bash -d /home/hadoop hadoop
 
 # install utils
-RUN apt-get install -y net-tools locales pv pandoc man vim nano sudo git 
+RUN apt-get install -y net-tools locales pv pandoc vim nano sudo git 
 RUN locale-gen en_US.UTF-8
 
 # setup environment variables for hadoop
@@ -121,7 +129,7 @@ ENV PATH=${SPARK_HOME}/bin:${PATH}
 
 # install softwares
 RUN apt-get install -y zsh screen unrar maven
-RUN ln -s /usr/bin/python3 /usr/bin/python
+#RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 COPY config/zsh/* ./
 COPY config/screen/* ./
