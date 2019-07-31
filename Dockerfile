@@ -140,7 +140,16 @@ COPY config/screen/* ./
 RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple virtualenv pipenv 
 
 # install hdf5 packages
-RUN apt-get install -y libjhdf5-java libhdf5-dev hdf5-tools hdf5-helpers
+# RUN apt-get install -y libjhdf5-java libhdf5-dev hdf5-tools hdf5-helpers
+COPY hdf/*.jar /usr/share/java/
+COPY hdf/*.so /usr/java/packages/lib/
+RUN ln -s /usr/java/packages/lib/libhdf5_java.so /usr/java/packages/lib/libhdf5_java.so.100 && \
+    ln -s /usr/java/packages/lib/libhdf5_java.so /usr/java/packages/lib/libhdf5_java.so.100.4.0 && \
+    ln -s /usr/java/packages/lib/libhdf_java.so /usr/java/packages/lib/libhdf_java.so.4.2.14 && \
+    ln -s /usr/java/packages/lib/libhdf.so /usr/java/packages/lib/libhdf.so.4.2.14 && \
+    ln -s /usr/java/packages/lib/libhdf5 /usr/java/packages/lib/libhdf5.so.103 && \
+    ln -s /usr/java/packages/lib/libhdf5 /usr/java/packages/lib/libhdf5.so.103.1.0
+
 
 #RUN useradd -u 1500 -s /bin/bash hadoop && \
 #    chown -R hadoop:hadoop ${HADOOP_HOME} ${DRILL_HOME} ${ZOOKEEPER_HOME} && \

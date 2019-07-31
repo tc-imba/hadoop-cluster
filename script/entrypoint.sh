@@ -14,8 +14,10 @@ for ((i=1;i<=10;i++)); do
     usermod -a -G hadoop pgroup$i
 done
 
-chmod -R 766 ${HADOOP_HOME}/logs
+chmod -R 777 ${HADOOP_HOME}/logs
 chown -R hadoop:hadoop ${HADOOP_HOME}/logs
+chmod -R 777 ${DRILL_HOME}/log
+chown -R hadoop:hadoop ${DRILL_HOME}/log
 
 # init hdfs for a new node
 # the ${HADOOP_HOME}/hdfs/data needs to be mounted
