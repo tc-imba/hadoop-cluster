@@ -9,18 +9,21 @@ A Hadoop cluster consists of multiple (N) Docker containers (1 master and N-1 wo
 
 1. Build docker image.
 ```bash
-./download.sh
+mkdir -p .config
+cp ~/.ssh/id_rsa .config
+cp ~/.ssh/id_rsa.pub .config
+./download.sh # need to prepare spark by yourself, not know why
 ./docker-build-image.sh
 ```
 
 2. Init docker and create a Hadoop network.
 ```bash
 docker system prune
-master/init_swarm.sh
+master/init_swarm.sh # does not work on manjaro
 master/init_network.sh
 ```
 
-3. Start containers. 
+3. Start containers.
 ```bash
 ./standalone.sh
 ```

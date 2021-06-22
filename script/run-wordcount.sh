@@ -6,7 +6,7 @@ echo "Hello Hadoop" >input/file1.txt
 hadoop fs -mkdir -p input
 hdfs dfs -put ./input/* input
 
-hadoop jar $HADOOP_HOME/share/hadoop/mapreduce/sources/hadoop-mapreduce-examples-3.2.0-sources.jar org.apache.hadoop.examples.WordCount input output
+hadoop jar $HADOOP_HOME/share/hadoop/mapreduce/sources/hadoop-mapreduce-examples-3.2.2-sources.jar org.apache.hadoop.examples.WordCount input output
 
 echo -e "\ninput file1.txt:"
 hdfs dfs -cat input/file1.txt

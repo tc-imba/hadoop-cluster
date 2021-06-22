@@ -1,7 +1,7 @@
-ARG HADOOP_VERSION=3.2.0
-ARG DRILL_VERSION=1.16.0
-ARG ZOOKEEPER_VERSION=3.5.5
-ARG SPARK_VERSION=2.4.3
+ARG HADOOP_VERSION=3.2.2
+ARG DRILL_VERSION=1.19.0
+ARG ZOOKEEPER_VERSION=3.7.0
+ARG SPARK_VERSION=2.4.8
 
 FROM ubuntu:18.04 AS tarballs
 WORKDIR /root
@@ -9,14 +9,14 @@ WORKDIR /root
 ENV DEBIAN_FRONTEND noninteractive
 
 COPY config/apt/sources.list /etc/apt/sources.list
-RUN echo 'Acquire::http { Proxy "http://hadoop-apt-cache:3142"; };' >> /etc/apt/apt.conf.d/01proxy
+# RUN echo 'Acquire::http { Proxy "http://hadoop-apt-cache:3142"; };' >> /etc/apt/apt.conf.d/01proxy
 
-RUN apt-get update && apt-get -y install pv curl
+RUN apt-get update && apt-get -y install pv curl apt-utils
 
 # copy downloaded files and download new files
 COPY tarballs/* tarballs/
 COPY download.sh ./
-RUN bash download.sh
+# RUN bash download.sh
 
 RUN useradd -u 1500 -s /bin/bash -d /home/hadoop hadoop
 
@@ -35,7 +35,7 @@ RUN pv -n tarballs/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz | \
 ARG SPARK_VERSION
 RUN pv -n tarballs/spark-${SPARK_VERSION}-bin-without-hadoop.tgz | \
     tar --owner=hadoop --group=hadoop --mode='g+wx' -xzf - 
-    
+
 FROM ubuntu:18.04
 WORKDIR /root
 
@@ -44,18 +44,18 @@ ENV DEBIAN_FRONTEND noninteractive
 
 
 COPY config/apt/sources.list /etc/apt/sources.list
-RUN echo 'Acquire::http { Proxy "http://hadoop-apt-cache:3142"; };' >> /etc/apt/apt.conf.d/01proxy
+# RUN echo 'Acquire::http { Proxy "http://hadoop-apt-cache:3142"; };' >> /etc/apt/apt.conf.d/01proxy
 RUN echo "" > /etc/dpkg/dpkg.cfg.d/excludes
 
 RUN apt-get update && apt-get install -y apt-transport-https ca-certificates apt-utils man
 
 # JDK 11 will be supported by hadoop 3.3.0
-ENV JDK_VERSION=8 
+ENV JDK_VERSION=8
 ENV JAVA_HOME=/usr/lib/jvm/java-${JDK_VERSION}-openjdk-amd64
 
 RUN apt-get install -y openjdk-${JDK_VERSION}-jdk-headless python python-pip \
-                        openssh-server curl python3 python3-pip scala r-base gcc g++ \
-                        binutils build-essential cmake x11-xserver-utils clang libgmp-dev
+    openssh-server curl python3 python3-pip scala r-base gcc g++ \
+    binutils build-essential cmake x11-xserver-utils clang libgmp-dev
 
 # generate & configure ssh key
 #RUN ssh-keygen -t rsa -f ~/.ssh/id_rsa -P '' && \
