@@ -9,10 +9,8 @@ A Hadoop cluster consists of multiple (N) Docker containers (1 master and N-1 wo
 
 1. Build docker image.
 ```bash
-mkdir -p .config
-cp ~/.ssh/id_rsa .config
-cp ~/.ssh/id_rsa.pub .config
-./download.sh # need to prepare spark by yourself, not know why
+mkdir -p .config && cp ~/.ssh/{id_rsa,id_rsa.pub} .config
+./download.sh
 ./build/docker-build-image.sh
 ```
 
