@@ -13,7 +13,7 @@ mkdir -p .config
 cp ~/.ssh/id_rsa .config
 cp ~/.ssh/id_rsa.pub .config
 ./download.sh # need to prepare spark by yourself, not know why
-./docker-build-image.sh
+./build/docker-build-image.sh
 ```
 
 2. Init docker and create a Hadoop network.
