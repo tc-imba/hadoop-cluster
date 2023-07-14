@@ -13,5 +13,5 @@ export SHELL_FOLDER=$(cd "$(dirname "$0")";pwd)
 #export CONFIG_FOLDER=$(cd "$(dirname "$0")/../.config";pwd)
 
 echo "start hadoop-master"
-docker-compose -f "$SHELL_FOLDER/docker-compose.yml" -p hadoop-master up -d
+docker compose -f "$SHELL_FOLDER/docker-compose.yml" -p hadoop-master up -d
 

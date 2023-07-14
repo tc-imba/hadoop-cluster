@@ -1,7 +1,7 @@
 #!/bin/bash
 
 HADOOP_VERSION=3.3.2
-DRILL_VERSION=1.20.1
+DRILL_VERSION=1.20.3
 ZOOKEEPER_VERSION=3.7.1
 SPARK_VERSION=2.4.8
 
@@ -44,7 +44,7 @@ function download_hadoop {
 }
 
 function download_drill {
-    check_download apache-drill-$DRILL_VERSION.tar.gz https://mirrors.tuna.tsinghua.edu.cn/apache/drill/drill-${DRILL_VERSION}
+    check_download apache-drill-$DRILL_VERSION.tar.gz https://mirrors.tuna.tsinghua.edu.cn/apache/drill/${DRILL_VERSION}
 }
 
 function download_zookeeper {
@@ -52,7 +52,7 @@ function download_zookeeper {
 }
 
 function download_spark {
-    check_download spark-$SPARK_VERSION-bin-without-hadoop.tgz https://mirrors.tuna.tsinghua.edu.cn/apache/spark/spark-${SPARK_VERSION}
+    check_download spark-$SPARK_VERSION-bin-without-hadoop.tgz https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}
 }
 
 case $1 in

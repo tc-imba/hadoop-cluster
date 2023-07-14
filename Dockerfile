@@ -1,5 +1,5 @@
 ARG HADOOP_VERSION=3.3.2
-ARG DRILL_VERSION=1.20.1
+ARG DRILL_VERSION=1.20.3
 ARG ZOOKEEPER_VERSION=3.7.1
 ARG SPARK_VERSION=2.4.8
 
@@ -132,8 +132,6 @@ ENV PATH=${SPARK_HOME}/bin:${PATH}
 # install softwares
 RUN apt-get install -y zsh screen unrar maven
 #RUN ln -s /usr/bin/python3 /usr/bin/python
-RUN sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-COPY config/zsh/* ./
 COPY config/screen/* ./
 
 # install python packages
