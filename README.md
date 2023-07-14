@@ -53,7 +53,7 @@ worker/join_swarm.sh <TOKEN> <IP-ADDRESS-OF-MANAGER>
 
 4. On `manager`, create an attachable overlay network called `hadoop-net`.
 ```bash
-msater/init_network.sh
+master/init_network.sh
 ```
 
 5. On `manager`, start an interactive (-it) container `hadoop-master` that connects to `hadoop-net`.
@@ -69,12 +69,23 @@ export WORKER_ID=X
 worker/start.sh
 ```
 
-7. Start NameNode daemon, DataNode daemon, ResourceManager daemon and NodeManager daemon in `hadoop-master` container.
+7. Record the ssh key of the `manager` node and copy them to the `worker` nodes.
+```bash
+## first find hadoop-master container id by 'docker container ls' on master host
+hadoopuser@hadoop-master-host $ docker exec -it $HOST_CONTAINER_ID bash
+root@hadoop-master # cat .ssh/id_rsa.pub
+
+## then copy key to worker host(s)
+hadoopuser@hadoop-worker-X-host $ docker exec -it $WORKER_CONTAINER_ID bash
+root@hadoop-worker-X # echo $SSH_PUBLIC_KEY > .ssh/authorized_keys
+```
+
+8. Start NameNode daemon, DataNode daemon, ResourceManager daemon and NodeManager daemon in `hadoop-master` container.
 ```bash
 master/start_hadoop.sh
 ```
 
-8. Run WordCount example in `hadoop-master` container.
+9. Run WordCount example in `hadoop-master` container.
 ```bash
 ./run-wordcount.sh
 ```
