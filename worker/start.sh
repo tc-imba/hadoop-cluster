@@ -18,7 +18,7 @@ export SHELL_FOLDER=$(cd "$(dirname "$0")";pwd)
 #export CONFIG_FOLDER=$(cd "$(dirname "$0")/../.config";pwd)
 
 echo "start hadoop-worker-$WORKER_ID"
-docker-compose -f "$SHELL_FOLDER/docker-compose.yml" -p hadoop-worker-$WORKER_ID up -d
+docker compose -f "$SHELL_FOLDER/docker-compose.yml" -p hadoop-worker-$WORKER_ID up -d
 
 
 
